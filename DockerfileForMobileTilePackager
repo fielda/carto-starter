@@ -1,0 +1,84 @@
+# vim:set filetype=dockerfile:
+
+# We are using an older version of Node.js because node-gyp fails to build
+# a sqlite3 package on the newer versions.
+FROM node:8.16.0
+
+# Update apt-get and install various utils
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+      # Tools to grab sources...
+      wget \
+      git \
+      # Vim, ping and tcpflow for troubleshooting containers.
+      # https://askubuntu.com/a/654993/17122
+      vim \
+      iputils-ping \
+      tcpflow &&\
+      # Clear the cache
+      rm -rf /var/lib/apt/lists/*
+
+# Ugh, https://github.com/nodejs/node-gyp/issues/942#issuecomment-221629496
+# We set NODEJS_ORG_MIRROR because otherwise node-gyp isn't able to find headers.
+ENV NODEJS_ORG_MIRROR="https://nodejs.org/download/release"
+
+# Default to production:
+# https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
+# Set NODE_PATH so globally installed modules will be found.
+# https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders
+ENV NODE_ENV=production NODE_PATH=/usr/local/lib/node_modules
+
+# Create a working directory and set permissions for install steps.
+RUN mkdir --parents /opt/mobile-tile-packager && \
+    chown -R node:node /opt/mobile-tile-packager &&\
+    chown -R node:node /usr/local/share &&\
+    chown -R node:node /usr/local/bin
+
+# Switch to our working directory.
+WORKDIR /opt/mobile-tile-packager
+
+# Switch to the lesser privileged "node" user as a best practice.
+USER node
+
+# Install tile packager
+RUN git clone https://github.com/CartoDB/mobile-tile-packager &&\
+    cd mobile-tile-packager &&\
+    echo "Checking out mobile-tile-packager 2f71983f (2019-08-01) ..." &&\
+    git checkout 2f71983f7a5da9750b59819187cce68f46d5b587 &&\
+    npm install
+
+# Install Tippecanoe
+RUN git clone https://github.com/mapbox/tippecanoe.git &&\
+    cd tippecanoe &&\
+    echo "Checking out tippecanoe 9e3fed8 (2019-06-18) ..." &&\
+    git checkout 9e3fed88346d12b202e6f532308578bfac45b620 &&\
+    make -j &&\
+    make install
+
+RUN echo "Configuring mobile-tile-packager ..." &&\
+    # 1. We HACK docker-compose.yml to alias {username}.carto_mapsapi and
+    #    {username}.carto_sqlapi for only a few users [dev, bolt].
+    #    This works for now, but only in dev environment.
+    #    TODO: A more robust networking and service discovery is needed.
+    sed -i "s/.carto.com\/api\/v1\/map/.carto_mapsapi:8181\/api\/v1\/map/w /dev/stdout" mobile-tile-packager/config.js &&\
+    # 2. TODO: Set the SQL API to a dummy URL if we aren't going to use it...
+    sed -i "s/http:\/\/{username}.carto.com\/api\/v2\/sql/https:\/\/{username}.carto_sqlapi:8080\/api\/v2\/sql/w /dev/stdout" mobile-tile-packager/config.js &&\
+    # 3. The Redis IP is aliased as "redis"...
+    #    TODO: For production, we must use $REDIS_HOST instead.
+    sed -i "s/127.0.0.1/redis/w /dev/stdout" mobile-tile-packager/config.js &&\
+    # 4. Reduce concurrency to reduce load on the Maps API.
+    #    Three works well on a Precision 7520 with Intel Core i7 (desktop replacement laptop)
+    sed -i "s/concurrency: 5/concurrency: 3/w /dev/stdout" mobile-tile-packager/config.js &&\
+    # 5. No HTTPS between the containers.
+    sed -i "s/https/http/w /dev/stdout" mobile-tile-packager/config.js &&\
+    # 6. Send log of every tile request to the console.
+    sed -i "s/report_log: false/report_log: true/w /dev/stdout" mobile-tile-packager/config.js
+
+
+# The Node.js app runs on 8787
+EXPOSE 8787
+
+WORKDIR /opt/mobile-tile-packager/mobile-tile-packager
+
+# Whatever is run as CMD will become PID 1.
+CMD ["node","service.js"]

@@ -1,0 +1,54 @@
+production:
+  adapter: postgresql
+  encoding: unicode
+  host: carto_postgres
+  port: 5432
+  direct_port: 5432
+  # This database is for the CartoDB builder/editor.
+  # Editor models like users information & visualizations are stored here.
+  database: carto_db_production
+  username: postgres
+  password: GoTornadoDino
+  conn_validator_timeout: 900
+  prepared_statements: false
+
+staging:
+  adapter: postgresql
+  encoding: unicode
+  host: carto_postgres
+  port: 5432
+  direct_port: 5432
+  database: carto_db_production
+  username: postgres
+  password: GoTornadoDino
+  conn_validator_timeout: 900
+  prepared_statements: false
+
+development:
+  adapter: postgresql
+  encoding: unicode
+  # 1. We are currently running apps in AWS production environment with
+  # environment vars set to "developoment". TODO: Change that!
+  # 2. Checkout startup.sh to see how we change this
+  # when HOSTING_ENVIRONMENT=AWS...
+  host: carto_postgres
+  port: 5432
+  direct_port: 5432
+  database: carto_db_production
+  username: postgres
+  password: GoTornadoDino
+  conn_validator_timeout: 900
+  pool: 50
+  prepared_statements: false
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: carto_db_production
+  host: carto_postgres
+  port: 5432
+  direct_port: 5432
+  username: postgres
+  password: GoTornadoDino
+  conn_validator_timeout: -1
+  prepared_statements: false

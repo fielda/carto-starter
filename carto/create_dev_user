@@ -1,0 +1,70 @@
+#!/bin/bash
+
+set -e
+
+cd /cartodb
+
+# ==============================================================
+# = This script creates a stand-alone user called "dev".       =
+# = See setup_organization.sh for the creation of user "bolt". =
+# ==============================================================
+
+# The names of these environment variables are not arbitrary.
+# https://github.com/CartoDB/cartodb/blob/master/lib/tasks/setup.rake#L135
+EMAIL="dev@example.org"
+USERNAME="dev" # aka USERNAME
+PASSWORD="bitcoin legend 8"
+ADMIN_PASSWORD="bitcoin legend 8"
+BUILDER_ENABLED="true"
+
+# https://github.com/CartoDB/cartodb/blob/master/lib/tasks/setup.rake#L144
+DATABASE_HOST=$POSTGRES_HOST
+
+echo "----- Creating the metadata database..."
+# bundle exec rake cartodb:db:create
+# bundle exec rake cartodb:db:migrate
+bundle exec rake cartodb:db:setup > /dev/null 2>&1
+
+echo "----- Creating user '${USERNAME}'..."
+bundle exec rake cartodb:db:create_user --trace SUBDOMAIN="${USERNAME}" \
+  PASSWORD="${PASSWORD}" ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
+  EMAIL="${EMAIL}" > /dev/null 2>&1
+
+echo "----- Increasing '${USERNAME}' user max layers..."
+bundle exec rake user:change:max_layers["${USERNAME}",99] > /dev/null 2>&1
+
+echo "----- Updating '${USERNAME}' user quota to 10GB..."
+bundle exec rake cartodb:db:set_user_quota["${USERNAME}",10240] > /dev/null 2>&1
+
+echo "----- Allowing unlimited tables creation for '${USERNAME}'..."
+bundle exec rake cartodb:db:set_unlimited_table_quota["${USERNAME}"] > /dev/null 2>&1
+
+echo "----- Allowing private tables creation for '${USERNAME}'..."
+bundle exec rake cartodb:db:set_user_private_tables_enabled["${USERNAME}",'true'] > /dev/null 2>&1
+
+echo "----- Setting the CartoDB account type for '${USERNAME}'..."
+# Should be DEDICATED or FREE: https://github.com/CartoDB/cartodb/commit/1aed0fc5d52
+bundle exec rake cartodb:db:set_user_account_type["${USERNAME}",'[DEDICATED]'] > /dev/null 2>&1
+
+echo "----- Set monthly geocoding limits for '${USERNAME}'..."
+bundle exec rake cartodb:services:set_user_quota["${USERNAME}",geocoding,10000] > /dev/null 2>&1
+
+echo "----- Updating '${USERNAME}' import limits..."
+# https://github.com/CartoDB/cartodb/blob/master/doc/manual/source/operations/changing_limits.rst
+MAX_BYTES=5000000000 # 5GB
+MAX_ROWS=5000000 # five million
+MAX_CONCURRENT_IMPORTS=5
+bundle exec rake cartodb:set_custom_limits_for_user["${USERNAME}",$MAX_BYTES,$MAX_ROWS,$MAX_CONCURRENT_IMPORTS] > /dev/null 2>&1
+
+# Set dataservices server, https://github.com/CartoDB/dataservices-api
+echo "----- Configuring geocoder extension for ALL non-org users..."
+bundle exec rake cartodb:db:configure_geocoder_extension_for_non_org_users["",true] > /dev/null 2>&1
+
+# Enable sync tables
+echo "----- Enable sync tables for '${USERNAME}'..."
+PGPASSWORD=$POSTGRES_PASSWORD psql --host=$POSTGRES_HOST \
+                                   --port=5432 \
+                                   --username=$POSTGRES_USER \
+                                   --command="UPDATE users SET sync_tables_enabled=true WHERE username='${USERNAME}'" \
+                                   --dbname=carto_db_production \
+                                   --echo-queries

@@ -1,0 +1,169 @@
+# vim:set filetype=dockerfile:
+
+FROM ubuntu:18.04
+
+# CartoDB installations assume UTF-8. Configure locales accordingly:
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update &&\
+    apt-get install -y \
+    locales \
+    apt-utils &&\
+    dpkg-reconfigure locales &&\
+    locale-gen en_US.UTF-8 &&\
+    update-locale LANG=en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+# 1. Create a 'cartodb' user.
+# 2. Update apt-get and install various utils and build tools.
+#    See http://cartodb.readthedocs.io/en/latest/install.html
+#    NOTE that PostgreSQL is NOT installed into this container.
+RUN useradd -m -d /home/cartodb -s /bin/bash cartodb &&\
+    apt-get install -y --no-install-recommends \
+      # These are needed according
+      # to https://github.com/CartoDB/Windshaft README ...
+      build-essential \
+      checkinstall \
+      pkg-config \
+      libcairo2-dev \
+      libjpeg8-dev \
+      libgif-dev \
+      # This is needed for add-apt-repository.
+      # See http://unix.stackexchange.com/a/45905/18918
+      software-properties-common \
+      # Carto maintains packaged versions of almost every part of the stack,
+      # but there are some parts like gems and npm packages that need
+      # these dev tools to be system installed in order to compile.
+      autoconf \
+      binutils-doc \
+      bison \
+      flex \
+      # These packages are needed for Ruby and the rvm installation.
+      gnupg \
+      libreadline6-dev \
+      openssl \
+      # tcpflow for troubleshooting, https://askubuntu.com/a/654993/17122
+      tcpflow \
+      # See https://github.com/sverhoeven/docker-cartodb/blob/master/Dockerfile
+      gdal-bin \
+      libgdal-dev \
+      # Tools to grab sources...
+      wget \
+      git \
+      # Vim and ping for troubleshooting containers.
+      vim \
+      iputils-ping \
+      # I don't know that these are needed. They are
+      # from https://github.com/sverhoeven/docker-cartodb/blob/master/Dockerfile
+      # which does not document why they are included, but I don't have
+      # time right now to look into each one.
+      automake \
+      ca-certificates \
+      curl \
+      git-core \
+      imagemagick \
+      libc6-dev \
+      libcurl4-gnutls-dev \
+      libffi-dev \
+      libgdbm-dev \
+      libgmp-dev \
+      libicu-dev \
+      libmapnik-dev \
+      libpq-dev \
+      libpq5 \
+      libreadline7 \
+      libreadline6-dev \
+      libsqlite3-dev \
+      libssl-dev \
+      libtool \
+      libxml2-dev \
+      libxslt-dev \
+      libyaml-dev \
+      mapnik-utils \
+      ncurses-dev \
+      zlib1g \
+      zlib1g-dev
+
+# These configs improve bash and Vim.
+# COPY ["db/dotfiles/*","/root/"]
+# COPY ["db/dotfiles/*","/home/carto/"]
+
+# Varnish is not needed in this container as long as windshaft.js points to
+# where we have it installed (carto_builder).
+
+RUN apt-get install -y \
+      # Install Proj4 for reprojection support.
+      proj-bin \
+      proj-data \
+      libproj-dev \
+      # Install this stuff for JSON/GeoJSON support.
+      libjson-c-dev \
+      python-simplejson \
+      # Install GEOS for geometry function support.
+      libgeos-c1v5 \
+      libgeos-dev \
+      # Having this avoids errors about cairo not being found...
+      libpango1.0-dev \
+      # Install the Postgres *client* software.
+      # This does not install the full database server.
+      postgresql-client-10 \
+      # These are used by the CartoDB editor...
+      # unp is required for archive file upload support
+      unp \
+      # zip is required for table exports
+      zip
+
+# Install Python requirements
+RUN wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py &&\
+    python /tmp/get-pip.py &&\
+    apt-get install -y \
+      python-all-dev \
+      python-gdal &&\
+    echo "Clearing the apt-get cache..." &&\
+    rm -rf /var/lib/apt/lists/*
+
+# Install NodeJS
+# Note that `npm install` fails with v8.2.1 because of some node-gyp error.
+RUN curl https://nodejs.org/download/release/v6.9.5/node-v6.9.5-linux-x64.tar.gz| tar -zxf - --strip-components=1 -C /usr
+
+# Default to production:
+# https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
+# Set NODE_PATH so globally installed modules will be found.
+# https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders
+ENV NODE_ENV=production NODE_PATH=/usr/local/lib/node_modules
+
+# Install Windshaft Maps API
+# Change the message if you change the changeset ID!
+RUN git clone https://github.com/CartoDB/Windshaft-cartodb.git &&\
+    cd Windshaft-cartodb &&\
+    echo "Checking out Windshaft-cartodb release 6.3.0 (2018-07-26) ..." &&\
+    git checkout 7f12cb3fdc318b4302cdd522a582fd4b76ae9136
+
+# Yarn installs work while NPM throws 'ENOENT: no such file or directory'.
+# TODO: Run ./configure ?? https://github.com/CartoDB/Windshaft-cartodb/blob/master/configure
+RUN cd Windshaft-cartodb &&\
+    # Windshaft's package.json currently requires yarn<=1.0.0
+    npm install --global yarn@0.28.4 &&\
+    yarn install &&\
+    mkdir logs
+
+ENV PATH /usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ENV GDAL_DATA /usr/share/gdal/2.2
+
+RUN mkdir -p /cartodb/log &&\
+    touch /cartodb/log/users_modifications
+
+# We assume the same config for dev and production.
+COPY ./carto/config/windshaft.js \
+      /Windshaft-cartodb/config/environments/development.js
+COPY ./carto/config/windshaft.js \
+      /Windshaft-cartodb/config/environments/production.js
+
+EXPOSE 8181
+
+WORKDIR /Windshaft-cartodb
+
+# https://www.ctl.io/developers/blog/post/dockerfile-entrypoint-vs-cmd
+ENTRYPOINT node app.js

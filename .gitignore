@@ -1,0 +1,33 @@
+# Logs
+log
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Redis snapshots
+dump.rdb
+
+# Public/private keys for serving tokens
+*.pem
+
+# Config
+aws.config
+
+# IDE stuff
+*.sublime-project
+*.sublime-workspace
+.vscode/settings.json
+*.un~
+*.swp
+.tern-port
+
+Dockerrun.local.json
+
+# Elastic Beanstalk Files
+saved_configs/
+
+# TileServer GL data folder
+tileserver/

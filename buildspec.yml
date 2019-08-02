@@ -1,0 +1,48 @@
+version: 0.1
+
+phases:
+  install:
+    commands:
+      - echo Nothing to do in the install phase...
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_REGION)
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo -----------------------
+      - echo Building Carto Windshaft Maps API...
+      - docker build --file ./DockerfileForCartoMapsAPI --tag carto_starter_mapsapi .
+      - echo docker tag carto_starter_mapsapi:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_mapsapi:latest
+      - docker tag carto_starter_mapsapi:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_mapsapi:latest
+      - echo -----------------------
+      - echo Building Carto SQL API...
+      - docker build --file ./DockerfileForCartoSQLAPI --tag carto_starter_sqlapi .
+      - echo docker tag carto_starter_sqlapi:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_sqlapi:latest
+      - docker tag carto_starter_sqlapi:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_sqlapi:latest
+      - echo -----------------------
+      - echo Building Carto Postgres...
+      - docker build --file ./DockerfileForCartoPostgres --tag carto_starter_postgres .
+      - echo docker tag carto_starter_postgres:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_postgres:latest
+      - docker tag carto_starter_postgres:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_postgres:latest
+      - echo -----------------------
+      - echo Building Carto Builder...
+      - docker build --file ./DockerfileForCartoBuilder --tag carto_starter_builder .
+      - echo docker tag carto_starter_builder:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_builder:latest
+      - docker tag carto_starter_builder:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_builder:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo -----------------------
+      - echo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_mapsapi:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_mapsapi:latest
+      - echo -----------------------
+      - echo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_sqlapi:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_sqlapi:latest
+      - echo -----------------------
+      - echo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_postgres:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_postgres:latest
+      - echo -----------------------
+      - echo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_builder:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/carto_starter_builder:latest

@@ -1,0 +1,491 @@
+Carto routes match in priority from top to bottom:
+
+Helper	HTTP Verb	Path	Controller#Action
+
+GET	/[(user/:user_domain)(u/:user_domain)](.:format)	admin/pages#public
+root_path	GET	/	admin/pages#index
+signup_path	GET	/signup(.:format)	signup#signup
+signup_organization_user_path	POST	/signup(.:format)	signup#create
+signup_subdomainless_path	GET	(/user/:user_domain)(/u/:user_domain)/signup(.:format)	signup#signup
+signup_subdomainless_organization_user_path	POST	(/user/:user_domain)(/u/:user_domain)/signup(.:format)	signup#create
+signup_http_authentication_path	GET	(/user/:user_domain)(/u/:user_domain)/signup_http_authentication(.:format)	signup#create_http_authentication
+signup_http_authentication_in_progress_path	GET	(/user/:user_domain)(/u/:user_domain)/signup_http_authentication_in_progress(.:format)	signup#create_http_authentication_in_progress
+enable_account_token_show_path	GET	(/user/:user_domain)(/u/:user_domain)/enable_account_token/:id(.:format)	account_tokens#enable
+resend_validation_mail_path	GET	(/user/:user_domain)(/u/:user_domain)/resend_validation_mail/:user_id(.:format)	account_tokens#resend
+account_token_authentication_error_path	GET	(/user/:user_domain)(/u/:user_domain)/account_token_authentication_error(.:format)	sessions#account_token_authentication_error
+login_path	GET	(/user/:user_domain)/login(.:format)	sessions#new
+logout_path	GET|POST	(/user/:user_domain)(/u/:user_domain)/logout(.:format)	sessions#destroy
+create_session_path	GET|POST	(/user/:user_domain)(/u/:user_domain)/sessions/create(.:format)	sessions#create
+GET	(/user/:user_domain)(/u/:user_domain)/status(.:format)	home#app_status
+GET	(/user/:user_domain)(/u/:user_domain)/diagnosis(.:format)	home#app_diagnosis
+edit_password_change_path	GET	/password_change/:id/edit(.:format)	password_change#edit
+password_change_path	PATCH	/password_change/:id(.:format)	password_change#update
+PUT	/password_change/:id(.:format)	password_change#update
+explore_index_path	GET	(/user/:user_domain)(/u/:user_domain)/explore(.:format)	explore#index
+explore_search_path	GET	(/user/:user_domain)(/u/:user_domain)/search(.:format)	explore#search
+explore_search_query_path	GET	(/user/:user_domain)(/u/:user_domain)/search/:q(.:format)	explore#search
+data_library_index_path	GET	(/user/:user_domain)(/u/:user_domain)/data-library(.:format)	data_library#index
+authorize_path	GET|POST	(/user/:user_domain)(/u/:user_domain)/oauth/authorize(.:format)	oauth#authorize
+request_token_path	GET|POST	(/user/:user_domain)(/u/:user_domain)/oauth/request_token(.:format)	oauth#request_token
+access_token_path	GET|POST	(/user/:user_domain)(/u/:user_domain)/oauth/access_token(.:format)	oauth#access_token
+oauth_show_sessions_path	GET	(/user/:user_domain)(/u/:user_domain)/oauth/identity(.:format)	sessions#show
+POST	(/user/:user_domain)(/u/:user_domain)/saml/finalize(.:format)	sessions#create
+google_plus_path	GET	/google_plus(.:format)	google_plus#google_plus
+google_plus_signup_path	POST	/google/signup(.:format)	google_plus#google_signup
+builder_visualization_public_embed_path	GET	(/user/:user_domain)(/u/:user_domain)/builder/:visualization_id/embed(.:format)	carto/builder/public/embeds#show {:visualization_id=>/[0-z\.\-]+/}
+builder_visualization_public_embed_protected_path	POST	(/user/:user_domain)(/u/:user_domain)/builder/:visualization_id/embed_protected(.:format)	carto/builder/public/embeds#show_protected {:visualization_id=>/[0-z\.\-]+/}
+GET	(/user/:user_domain)(/u/:user_domain)/builder/:visualization_id/embed_protected(.:format)	carto/builder/public/embeds#show {:visualization_id=>/[0-z\.\-]+/}
+builder_visualization_path	GET	(/user/:user_domain)(/u/:user_domain)/builder/:id(.:format)	carto/builder/visualizations#show {:id=>/[0-z\.\-]+/}
+builder_path	GET	(/user/:user_domain)(/u/:user_domain)/builder/:id/*other(.:format)	carto/builder/visualizations#show
+builder_dataset_path	GET	(/user/:user_domain)(/u/:user_domain)/dataset/:id(.:format)	carto/builder/datasets#show {:id=>/[0-z\.\-]+/}
+editor_path	GET	(/user/:user_domain)(/u/:user_domain)/editor(/*path)(.:format)	redirect(301)
+github_path	GET	(/user/:user_domain)(/u/:user_domain)/github(.:format)	carto/oauth_login#github
+google_oauth_path	GET	(/user/:user_domain)(/u/:user_domain)/google/oauth(.:format)	carto/oauth_login#google
+saml_metadata_path	GET	(/user/:user_domain)(/u/:user_domain)/saml/metadata(.:format)	carto/saml#metadata
+organization_path	GET	(/user/:user_domain)(/u/:user_domain)/organization(.:format)	admin/organizations#show
+organization_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/organization(.:format)	admin/organizations#destroy
+organization_settings_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/settings(.:format)	admin/organizations#settings
+organization_settings_update_path	PUT|PATCH	(/user/:user_domain)(/u/:user_domain)/organization/settings(.:format)	admin/organizations#settings_update
+regenerate_organization_users_api_key_path	POST	(/user/:user_domain)(/u/:user_domain)/organization/regenerate_api_keys(.:format)	admin/organizations#regenerate_all_api_keys
+organization_groups_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/groups(/*other)(.:format)	admin/organizations#groups
+organization_auth_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/auth(.:format)	admin/organizations#auth
+organization_auth_update_path	PUT|PATCH	(/user/:user_domain)(/u/:user_domain)/organization/auth(.:format)	admin/organizations#auth_update
+organization_notifications_admin_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/notifications(.:format)	admin/organizations#notifications
+new_organization_notification_admin_path	POST	(/user/:user_domain)(/u/:user_domain)/organization/notifications(.:format)	admin/organizations#new_notification
+destroy_organization_notification_admin_path	DELETE	(/user/:user_domain)(/u/:user_domain)/organization/notifications/:id(.:format)	admin/organizations#destroy_notification
+edit_organization_user_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/users/:id/edit(.:format)	admin/organization_users#edit {:id=>/[0-z\.\-]+/}
+update_organization_user_path	PUT|PATCH	(/user/:user_domain)(/u/:user_domain)/organization/users/:id(.:format)	admin/organization_users#update {:id=>/[0-z\.\-]+/}
+organization_users_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/users(.:format)	admin/organizations#show
+create_organization_user_path	POST	(/user/:user_domain)(/u/:user_domain)/organization/users(.:format)	admin/organization_users#create
+delete_organization_user_path	DELETE	(/user/:user_domain)(/u/:user_domain)/organization/users/:id(.:format)	admin/organization_users#destroy {:id=>/[0-z\.\-]+/}
+regenerate_organization_user_api_key_path	POST	(/user/:user_domain)(/u/:user_domain)/organization/users/:id/regenerate_api_key(.:format)	admin/organization_users#regenerate_api_key {:id=>/[^\/]+/}
+new_organization_user_path	GET	(/user/:user_domain)(/u/:user_domain)/organization/users/new(.:format)	admin/organization_users#new
+profile_user_path	GET	(/user/:user_domain)(/u/:user_domain)/profile(.:format)	admin/users#profile
+account_user_path	GET	(/user/:user_domain)(/u/:user_domain)/account(.:format)	admin/users#account
+lockout_path	GET	(/user/:user_domain)(/u/:user_domain)/lockout(.:format)	admin/users#lockout
+search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/search/:q(.:format)	admin/visualizations#index
+search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/search/:q/:page(.:format)	admin/visualizations#index
+search_shared_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/shared/search/:q(.:format)	admin/visualizations#index
+search_shared_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/shared/search/:q/:page(.:format)	admin/visualizations#index
+tables_index_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables(.:format)	admin/visualizations#index
+tables_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/:page(.:format)	admin/visualizations#index
+tables_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/tag/:tag(.:format)	admin/visualizations#index
+tables_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/tag/:tag/:page(.:format)	admin/visualizations#index
+tables_shared_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared(.:format)	admin/visualizations#index
+tables_shared_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared/:page(.:format)	admin/visualizations#index
+tables_shared_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared/tag/:tag(.:format)	admin/visualizations#index
+tables_shared_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared/tag/:tag/:page(.:format)	admin/visualizations#index
+tables_mine_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine(.:format)	admin/visualizations#index
+tables_mine_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/:page(.:format)	admin/visualizations#index
+tables_mine_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/tag/:tag(.:format)	admin/visualizations#index
+tables_mine_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/tag/:tag/:page(.:format)	admin/visualizations#index
+tables_mine_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked(.:format)	admin/visualizations#index
+tables_mine_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked/:page(.:format)	admin/visualizations#index
+tables_mine_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked/tag/:tag(.:format)	admin/visualizations#index
+tables_mine_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+tables_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked(.:format)	admin/visualizations#index
+tables_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked/:page(.:format)	admin/visualizations#index
+tables_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked/tag/:tag(.:format)	admin/visualizations#index
+tables_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_index_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets(.:format)	admin/visualizations#index
+datasets_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/:page(.:format)	admin/visualizations#index
+datasets_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/tag/:tag(.:format)	admin/visualizations#index
+datasets_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_shared_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared(.:format)	admin/visualizations#index
+datasets_shared_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/:page(.:format)	admin/visualizations#index
+datasets_shared_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/tag/:tag(.:format)	admin/visualizations#index
+datasets_shared_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_shared_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked(.:format)	admin/visualizations#index
+datasets_shared_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked/:page(.:format)	admin/visualizations#index
+datasets_shared_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked/tag/:tag(.:format)	admin/visualizations#index
+datasets_shared_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_liked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked(.:format)	admin/visualizations#index
+datasets_liked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/:page(.:format)	admin/visualizations#index
+datasets_liked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/tag/:tag(.:format)	admin/visualizations#index
+datasets_liked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_liked_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked(.:format)	admin/visualizations#index
+datasets_liked_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked/:page(.:format)	admin/visualizations#index
+datasets_liked_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked/tag/:tag(.:format)	admin/visualizations#index
+datasets_liked_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked(.:format)	admin/visualizations#index
+datasets_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked/:page(.:format)	admin/visualizations#index
+datasets_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked/tag/:tag(.:format)	admin/visualizations#index
+datasets_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+datasets_library_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library(.:format)	admin/visualizations#index
+datasets_library_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library/:page(.:format)	admin/visualizations#index
+datasets_library_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library/tag/:tag(.:format)	admin/visualizations#index
+datasets_library_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library/tag/:tag/:page(.:format)	admin/visualizations#index
+tables_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/search/:q(.:format)	admin/visualizations#index
+tables_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/search/:q/:page(.:format)	admin/visualizations#index
+tables_shared_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared/search/:q(.:format)	admin/visualizations#index
+tables_shared_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/shared/search/:q/:page(.:format)	admin/visualizations#index
+tables_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked/search/:q(.:format)	admin/visualizations#index
+tables_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/locked/search/:q/:page(.:format)	admin/visualizations#index
+tables_mine_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/search/:q(.:format)	admin/visualizations#index
+tables_mine_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/search/:q/:page(.:format)	admin/visualizations#index
+tables_mine_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked/search/:q(.:format)	admin/visualizations#index
+tables_mine_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tables/mine/locked/search/:q/:page(.:format)	admin/visualizations#index
+datasets_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/search/:q(.:format)	admin/visualizations#index
+datasets_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/search/:q/:page(.:format)	admin/visualizations#index
+datasets_shared_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/search/:q(.:format)	admin/visualizations#index
+datasets_shared_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/search/:q/:page(.:format)	admin/visualizations#index
+datasets_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked/search/:q(.:format)	admin/visualizations#index
+datasets_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/locked/search/:q/:page(.:format)	admin/visualizations#index
+datasets_shared_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked/search/:q(.:format)	admin/visualizations#index
+datasets_shared_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/shared/locked/search/:q/:page(.:format)	admin/visualizations#index
+datasets_liked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/search/:q(.:format)	admin/visualizations#index
+datasets_liked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/search/:q/:page(.:format)	admin/visualizations#index
+datasets_liked_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked/search/:q(.:format)	admin/visualizations#index
+datasets_liked_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/liked/locked/search/:q/:page(.:format)	admin/visualizations#index
+datasets_library_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library/search/:q(.:format)	admin/visualizations#index
+datasets_library_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/datasets/library/search/:q/:page(.:format)	admin/visualizations#index
+visualizations_index_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations(.:format)	admin/visualizations#index
+visualizations_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/:page(.:format)	admin/visualizations#index
+visualizations_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/tag/:tag(.:format)	admin/visualizations#index
+visualizations_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/tag/:tag/:page(.:format)	admin/visualizations#index
+visualizations_shared_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared(.:format)	admin/visualizations#index
+visualizations_shared_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared/:page(.:format)	admin/visualizations#index
+visualizations_shared_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared/tag/:tag(.:format)	admin/visualizations#index
+visualizations_shared_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared/tag/:tag/:page(.:format)	admin/visualizations#index
+visualizations_mine_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine(.:format)	admin/visualizations#index
+visualizations_mine_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/:page(.:format)	admin/visualizations#index
+visualizations_mine_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/tag/:tag(.:format)	admin/visualizations#index
+visualizations_mine_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/tag/:tag/:page(.:format)	admin/visualizations#index
+visualizations_mine_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked(.:format)	admin/visualizations#index
+visualizations_mine_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked/:page(.:format)	admin/visualizations#index
+visualizations_mine_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked/tag/:tag(.:format)	admin/visualizations#index
+visualizations_mine_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+visualizations_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked(.:format)	admin/visualizations#index
+visualizations_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked/:page(.:format)	admin/visualizations#index
+visualizations_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked/tag/:tag(.:format)	admin/visualizations#index
+visualizations_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_index_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps(.:format)	admin/visualizations#index
+maps_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/:page(.:format)	admin/visualizations#index
+maps_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/tag/:tag(.:format)	admin/visualizations#index
+maps_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_shared_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared(.:format)	admin/visualizations#index
+maps_shared_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/:page(.:format)	admin/visualizations#index
+maps_shared_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/tag/:tag(.:format)	admin/visualizations#index
+maps_shared_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_shared_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked(.:format)	admin/visualizations#index
+maps_shared_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked/:page(.:format)	admin/visualizations#index
+maps_shared_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked/tag/:tag(.:format)	admin/visualizations#index
+maps_shared_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_liked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked(.:format)	admin/visualizations#index
+maps_liked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/:page(.:format)	admin/visualizations#index
+maps_liked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/tag/:tag(.:format)	admin/visualizations#index
+maps_liked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_liked_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked(.:format)	admin/visualizations#index
+maps_liked_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked/:page(.:format)	admin/visualizations#index
+maps_liked_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked/tag/:tag(.:format)	admin/visualizations#index
+maps_liked_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+maps_locked_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked(.:format)	admin/visualizations#index
+maps_locked_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked/:page(.:format)	admin/visualizations#index
+maps_locked_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked/tag/:tag(.:format)	admin/visualizations#index
+maps_locked_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked/tag/:tag/:page(.:format)	admin/visualizations#index
+dashboards_index_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/deep-insights(.:format)	admin/visualizations#index
+dashboards_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/deep-insights/:page(.:format)	admin/visualizations#index
+visualizations_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/search/:q(.:format)	admin/visualizations#index
+visualizations_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/search/:q/:page(.:format)	admin/visualizations#index
+visualizations_shared_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared/search/:q(.:format)	admin/visualizations#index
+visualizations_shared_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/shared/search/:q/:page(.:format)	admin/visualizations#index
+visualizations_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked/search/:q(.:format)	admin/visualizations#index
+visualizations_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/locked/search/:q/:page(.:format)	admin/visualizations#index
+visualizations_mine_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/search/:q(.:format)	admin/visualizations#index
+visualizations_mine_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/search/:q/:page(.:format)	admin/visualizations#index
+visualizations_mine_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked/search/:q(.:format)	admin/visualizations#index
+visualizations_mine_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/visualizations/mine/locked/search/:q/:page(.:format)	admin/visualizations#index
+maps_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/search/:q(.:format)	admin/visualizations#index
+maps_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/search/:q/:page(.:format)	admin/visualizations#index
+maps_shared_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/search/:q(.:format)	admin/visualizations#index
+maps_shared_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/search/:q/:page(.:format)	admin/visualizations#index
+maps_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked/search/:q(.:format)	admin/visualizations#index
+maps_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/locked/search/:q/:page(.:format)	admin/visualizations#index
+maps_shared_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked/search/:q(.:format)	admin/visualizations#index
+maps_shared_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/shared/locked/search/:q/:page(.:format)	admin/visualizations#index
+maps_liked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/search/:q(.:format)	admin/visualizations#index
+maps_liked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/search/:q/:page(.:format)	admin/visualizations#index
+maps_liked_locked_search_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked/search/:q(.:format)	admin/visualizations#index
+maps_liked_locked_search_page_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/maps/liked/locked/search/:q/:page(.:format)	admin/visualizations#index
+tags_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/tag/:tag(.:format)	admin/visualizations#index
+dashboard_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard(.:format)	admin/visualizations#index
+dashboard_bis_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard(.:format)	admin/visualizations#index
+dashboard_common_data_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/common_data(.:format)	admin/pages#common_data
+dashboard_common_data_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/dashboard/common_data/:tag(.:format)	admin/pages#common_data
+public_user_feed_home_path	GET	(/user/:user_domain)(/u/:user_domain)/me(.:format)	admin/pages#user_feed
+public_page_path	GET	(/user/:user_domain)(/u/:user_domain)/page/:page(.:format)	admin/pages#public
+public_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/tag/:tag(.:format)	admin/pages#public
+public_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/tag/:tag/:page(.:format)	admin/pages#public
+public_maps_home_path	GET	(/user/:user_domain)(/u/:user_domain)/maps(.:format)	admin/pages#maps
+public_datasets_home_path	GET	(/user/:user_domain)(/u/:user_domain)/datasets(.:format)	admin/pages#datasets
+public_datasets_page_path	GET	(/user/:user_domain)(/u/:user_domain)/datasets/page/:page(.:format)	admin/pages#datasets
+public_datasets_tag_path	GET	(/user/:user_domain)(/u/:user_domain)/datasets/tag/:tag(.:format)	admin/pages#datasets
+public_datasets_tag_page_path	GET	(/user/:user_domain)(/u/:user_domain)/datasets/tag/:tag/:page(.:format)	admin/pages#datasets
+public_sitemap_path	GET	/sitemap.xml(.:format)	admin/pages#sitemap
+public_tables_show_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id(.:format)	admin/visualizations#show {:id=>/[^\/]+/}
+public_tables_show_bis_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id(.:format)	admin/visualizations#show {:id=>/[^\/]+/}
+public_tables_show_map_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/map(.:format)	admin/visualizations#show {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_tables_table_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/table(.:format)	admin/visualizations#show {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_table_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/public(.:format)	admin/visualizations#public_table {:id=>/[^\/]+/}
+public_table_table_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/public/table(.:format)	admin/visualizations#public_table {:id=>/[^\/]+/}
+public_table_map_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/public/map(.:format)	admin/visualizations#public_table {:id=>/[^\/]+/}
+public_tables_embed_map_path	GET	(/user/:user_domain)(/u/:user_domain)/tables/:id/embed_map(.:format)	admin/visualizations#embed_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_visualizations_home_path	GET	(/user/:user_domain)(/u/:user_domain)(.:format)	admin/pages#public {:dont_rewrite=>true}
+public_visualizations_path	GET	(/user/:user_domain)(/u/:user_domain)/viz(.:format)	admin/visualizations#index {:dont_rewrite=>true}
+public_visualizations_track_embed_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/track_embed(.:format)	admin/visualizations#track_embed {:dont_rewrite=>true}
+public_visualizations_embed_forbidden_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/embed_forbidden(.:format)	admin/visualizations#embed_forbidden {:dont_rewrite=>true}
+public_visualizations_show_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id(.:format)	admin/visualizations#show {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_visualizations_show_map_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/map(.:format)	admin/visualizations#show {:id=>/[^\/]+/}
+public_visualizations_table_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/table(.:format)	admin/visualizations#show {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_visualization_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/public(.:format)	admin/visualizations#public_table {:id=>/[^\/]+/}
+public_visualizations_embed_map_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/embed_map(.:format)	admin/visualizations#embed_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+public_visualizations_public_map_path	GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/public_map(.:format)	admin/visualizations#public_map {:id=>/[^\/]+/}
+GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/protected_embed_map(.:format)	admin/visualizations#show_protected_embed_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+protected_embed_map_path	POST	(/user/:user_domain)(/u/:user_domain)/viz/:id/protected_embed_map(.:format)	admin/visualizations#show_protected_embed_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+GET	(/user/:user_domain)(/u/:user_domain)/viz/:id/protected_public_map(.:format)	admin/visualizations#show_protected_public_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+protected_public_map_path	POST	(/user/:user_domain)(/u/:user_domain)/viz/:id/protected_public_map(.:format)	admin/visualizations#show_protected_public_map {:dont_rewrite=>true, :id=>/[^\/]+/}
+api_key_credentials_path	GET	(/user/:user_domain)(/u/:user_domain)/your_apps(.:format)	admin/client_applications#api_key
+regenerate_api_key_path	POST	(/user/:user_domain)(/u/:user_domain)/your_apps/api_key/regenerate(.:format)	admin/client_applications#regenerate_api_key
+oauth_credentials_path	GET	(/user/:user_domain)(/u/:user_domain)/your_apps/oauth(.:format)	admin/client_applications#oauth
+regenerate_oauth_path	DELETE	(/user/:user_domain)(/u/:user_domain)/your_apps/oauth/regenerate(.:format)	admin/client_applications#regenerate_oauth
+mobile_apps_path	GET	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile(.:format)	carto/admin/mobile_apps#index
+POST	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile(.:format)	carto/admin/mobile_apps#create
+new_mobile_app_path	GET	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile/new(.:format)	carto/admin/mobile_apps#new
+mobile_app_path	GET	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile/:id(.:format)	carto/admin/mobile_apps#show
+PATCH	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile/:id(.:format)	carto/admin/mobile_apps#update
+PUT	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile/:id(.:format)	carto/admin/mobile_apps#update
+DELETE	(/user/:user_domain)(/u/:user_domain)/your_apps/mobile/:id(.:format)	carto/admin/mobile_apps#destroy
+api_v1_visualizations_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz(.:format)	carto/api/visualizations#index {:format=>:json}
+api_v1_visualizations_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id(.:format)	carto/api/visualizations#show {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_related_templates_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/related_templates(.:format)	carto/api/templates#related_templates_by_visualization {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_likes_count_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/likes(.:format)	carto/api/visualizations#likes_count {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_likes_list_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/likes/detailed(.:format)	carto/api/visualizations#likes_list {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_is_liked_path	GET|OPTIONS	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/like(.:format)	carto/api/visualizations#is_liked {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_add_like_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/like(.:format)	carto/api/visualizations#add_like {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_remove_like_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/like(.:format)	carto/api/visualizations#remove_like {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_list_watching_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/watching(.:format)	carto/api/visualizations#notify_watching {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_notify_watching_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/watching(.:format)	carto/api/visualizations#list_watching {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/viz(.:format)	carto/api/visualizations#create {:format=>:json}
+api_v1_visualizations_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id(.:format)	carto/api/visualizations#update {:format=>:json, :id=>/[^\/]+/}
+api_v1_visualizations_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id(.:format)	carto/api/visualizations#destroy {:format=>:json, :id=>/[^\/]+/}
+api_v1_google_maps_static_image_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:id/google_maps_static_image(.:format)	carto/api/visualizations#google_maps_static_image {:format=>:json, :id=>/[^\/]+/}
+api_v1_tables_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:id(.:format)	carto/api/tables#show {:format=>:json, :id=>/[^\/]+/}
+api_v1_tables_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/tables(.:format)	carto/api/tables#create {:format=>:json}
+api_v1_tables_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:id(.:format)	carto/api/tables#update {:format=>:json, :id=>/[^\/]+/}
+api_v1_tables_related_templates_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:id/related_templates(.:format)	carto/api/templates#related_templates_by_table {:format=>:json, :id=>/[^\/]+/}
+api_v1_tables_columns_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/columns(.:format)	carto/api/columns#index {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_columns_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/columns/:id(.:format)	carto/api/columns#show {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_columns_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/columns(.:format)	carto/api/columns#create {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_columns_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/columns/:id(.:format)	carto/api/columns#update {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_columns_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/columns/:id(.:format)	carto/api/columns#destroy {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_records_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/records/:id(.:format)	carto/api/records#show {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_records_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/records(.:format)	carto/api/records#create {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_record_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/records/:cartodb_id(.:format)	carto/api/records#update {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_tables_record_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/tables/:table_id/records/:cartodb_id(.:format)	carto/api/records#destroy {:format=>:json, :table_id=>/[^\/]+/}
+api_v1_imports_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports(.:format)	carto/api/imports#index {:format=>:json}
+api_v1_imports_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/:id(.:format)	carto/api/imports#show {:format=>:json}
+api_v1_imports_service_token_valid_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/token_valid(.:format)	carto/api/imports#service_token_valid? {:format=>:json}
+api_v1_imports_service_list_files_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/list_files(.:format)	carto/api/imports#list_files_for_service {:format=>:json}
+api_v1_imports_service_auth_url_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/auth_url(.:format)	carto/api/imports#get_service_auth_url {:format=>:json}
+api_v1_imports_service_validate_code_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/validate_code/:code(.:format)	carto/api/imports#validate_service_oauth_code {:format=>:json}
+api_v1_imports_service_oauth_callback_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/oauth_callback(.:format)	carto/api/imports#service_oauth_callback {:format=>:json}
+api_v1_users_layers_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/layers(.:format)	carto/api/layers#user_index {:format=>:json}
+api_v1_users_layers_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/layers/:id(.:format)	carto/api/layers#user_show {:format=>:json}
+api_v1_users_layers_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/layers(.:format)	carto/api/layers#user_create {:format=>:json}
+api_v1_users_layers_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/layers/:id(.:format)	carto/api/layers#user_update {:format=>:json}
+api_v1_users_layers_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/layers/:id(.:format)	carto/api/layers#user_destroy {:format=>:json}
+api_v1_maps_layers_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:map_id/layers(.:format)	carto/api/layers#map_index {:format=>:json}
+api_v1_maps_layers_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:map_id/layers/:id(.:format)	carto/api/layers#map_show {:format=>:json}
+api_v1_maps_layers_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:map_id/layers(.:format)	carto/api/layers#map_create {:format=>:json}
+api_v1_maps_layers_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:map_id/layers(/:id)(.:format)	carto/api/layers#map_update {:format=>:json}
+api_v1_maps_layers_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:map_id/layers/:id(.:format)	carto/api/layers#map_destroy {:format=>:json}
+api_v1_synchronizations_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations(.:format)	carto/api/synchronizations#index {:format=>:json}
+api_v1_synchronizations_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations/:id(.:format)	carto/api/synchronizations#show {:format=>:json}
+api_v1_synchronizations_syncing_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations/:id/sync_now(.:format)	carto/api/synchronizations#syncing? {:format=>:json}
+api_v1_oembed_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/oembed(.:format)	carto/api/oembed#show {:format=>:json}
+api_v1_geocodings_available_geometries_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings/available_geometries(.:format)	carto/api/geocodings#available_geometries {:format=>:json}
+api_v1_geocodings_estimation_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings/estimation_for/:table_name(.:format)	carto/api/geocodings#estimation_for {:format=>:json, :table_name=>/[^\/]+/}
+api_v1_geocodings_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings(.:format)	carto/api/geocodings#index {:format=>:json}
+api_v1_geocodings_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings/:id(.:format)	carto/api/geocodings#show {:format=>:json}
+api_v1_users_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:id(.:format)	carto/api/users#show {:format=>:json}
+api_v1_users_get_authenticated_user_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/get_authenticated_users(.:format)	carto/api/users#get_authenticated_users {:format=>:json}
+api_v1_users_assets_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/assets(.:format)	carto/api/assets#index {:format=>:json}
+api_v1_organization_users_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id/users(.:format)	carto/api/organizations#users {:format=>:json, :id=>/[^\/]+/}
+api_v1_organization_groups_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups(.:format)	carto/api/groups#index {:format=>:json, :organization_id=>/[^\/]+/}
+api_v1_organization_groups_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups/:group_id(.:format)	carto/api/groups#show {:format=>:json, :organization_id=>/[^\/]+/, :group_id=>/[^\/]+/}
+api_v1_organization_groups_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups(.:format)	carto/api/groups#create {:format=>:json, :organization_id=>/[^\/]+/}
+api_v1_organization_groups_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups/:group_id(.:format)	carto/api/groups#update {:format=>:json, :organization_id=>/[^\/]+/, :group_id=>/[^\/]+/}
+api_v1_organization_groups_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups/:group_id(.:format)	carto/api/groups#destroy {:format=>:json, :organization_id=>/[^\/]+/, :group_id=>/[^\/]+/}
+api_v1_user_groups_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/groups(.:format)	carto/api/groups#index {:format=>:json, :user_id=>/[^\/]+/}
+api_v1_organization_groups_users_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id/groups/:group_id/users(.:format)	carto/api/organizations#users {:format=>:json, :group_id=>/[^\/]+/}
+api_v1_organization_groups_add_users_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups/:group_id/users(.:format)	carto/api/groups#add_users {:format=>:json, :organization_id=>/[^\/]+/, :group_id=>/[^\/]+/}
+api_v1_organization_groups_remove_users_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/groups/:group_id/users(/:user_id)(.:format)	carto/api/groups#remove_users {:format=>:json, :organization_id=>/[^\/]+/, :group_id=>/[^\/]+/, :user_id=>/[^\/]+/}
+api_v1_databases_group_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups(.:format)	carto/api/database_groups#create {:format=>:json}
+api_v1_databases_group_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:old_name(.:format)	carto/api/database_groups#update {:format=>:json}
+api_v1_databases_group_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:name(.:format)	carto/api/database_groups#destroy {:format=>:json}
+api_v1_databases_group_add_users_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:name/users(.:format)	carto/api/database_groups#add_users {:format=>:json}
+api_v1_databases_group_remove_users_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:name/users(/:username)(.:format)	carto/api/database_groups#remove_users {:format=>:json}
+api_v1_databases_group_update_permission_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:name/permission/:username/tables/:table_name(.:format)	carto/api/database_groups#update_permission {:format=>:json}
+api_v1_databases_group_destroy_permission_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/databases/:database_name/groups/:name/permission/:username/tables/:table_name(.:format)	carto/api/database_groups#destroy_permission {:format=>:json}
+api_v1_grantables_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/grantables(.:format)	carto/api/grantables#index {:format=>:json}
+api_v1_user_creations_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/user_creations/:id(.:format)	carto/api/user_creations#show {:format=>:json, :id=>/[^\/]+/}
+api_v1_organization_invitations_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/invitations(.:format)	carto/api/invitations#create {:format=>:json, :organization_id=>/[^\/]+/}
+api_v1_vis_templates_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/templates(.:format)	carto/api/templates#index {:format=>:json}
+api_v1_vis_templates_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/templates/:id(.:format)	carto/api/templates#show {:format=>:json, :id=>/[^\/]+/}
+api_v1_vis_templates_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/templates(.:format)	carto/api/templates#create {:format=>:json}
+api_v1_vis_templates_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/templates/:id(.:format)	carto/api/templates#update {:format=>:json, :id=>/[^\/]+/}
+api_v1_vis_templates_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/templates/:id(.:format)	carto/api/templates#destroy {:format=>:json, :id=>/[^\/]+/}
+api_v2_visualizations_vizjson_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/viz/:id/viz(.:format)	carto/api/visualizations#vizjson2 {:format=>:json, :id=>/[^\/]+/}
+api_v2_visualizations_static_map_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/viz/:id/static/:width/:height.png(.:format)	carto/api/visualizations#static_map {:format=>:json, :id=>/[^\/]+/}
+GET	(/user/:user_domain)(/u/:user_domain)/api/v1/image_proxy(.:format)	carto/api/image_proxy#show {:format=>:json}
+api_v1_permissions_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/perm/:id(.:format)	carto/api/permissions#update {:format=>:json}
+api_v1_uploads_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/uploads(.:format)	api/json/uploads#create {:format=>:json}
+api_v1_imports_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/imports(.:format)	api/json/imports#create {:format=>:json}
+api_v1_imports_service_invalidate_token_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/imports/service/:id/invalidate_token(.:format)	api/json/imports#invalidate_service_token {:format=>:json}
+api_v1_users_assets_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/assets(.:format)	api/json/assets#create {:format=>:json}
+api_v1_users_assets_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/users/:user_id/assets/:id(.:format)	api/json/assets#destroy {:format=>:json}
+api_v1_geocodings_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings(.:format)	api/json/geocodings#create {:format=>:json}
+api_v1_geocodings_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/geocodings/:id(.:format)	api/json/geocodings#update {:format=>:json}
+api_v1_synchronizations_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations(.:format)	api/json/synchronizations#create {:format=>:json}
+api_v1_synchronizations_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations/:id(.:format)	api/json/synchronizations#update {:format=>:json}
+api_v1_synchronizations_destroy_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations/:id(.:format)	api/json/synchronizations#destroy {:format=>:json}
+api_v1_synchronizations_sync_now_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/synchronizations/:id/sync_now(.:format)	api/json/synchronizations#sync_now {:format=>:json}
+api_v1_organization_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/org(.:format)	api/json/organizations#show {:format=>:json}
+api_v2_wms_proxy_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/wms(.:format)	api/json/wms#proxy {:format=>:json}
+GET	/superadmin/users/:id/dump(.:format)	superadmin/users#dump
+GET	/superadmin/users/:id/data_imports(.:format)	superadmin/users#data_imports
+GET	/superadmin/users/:id/data_imports/:data_import_id(.:format)	superadmin/users#data_import
+GET	/superadmin/users/:id/synchronizations(.:format)	superadmin/users#synchronizations
+GET	/superadmin/users/:id/synchronizations/:synchronization_id(.:format)	superadmin/users#synchronization
+GET	/superadmin/users/:id/geocodings(.:format)	superadmin/users#geocodings
+GET	/superadmin/users/:id/geocodings/:geocoding_id(.:format)	superadmin/users#geocoding
+superadmin_users_path	GET	/superadmin/users(.:format)	superadmin/users#index
+POST	/superadmin/users(.:format)	superadmin/users#create
+new_superadmin_user_path	GET	/superadmin/users/new(.:format)	superadmin/users#new
+edit_superadmin_user_path	GET	/superadmin/users/:id/edit(.:format)	superadmin/users#edit
+superadmin_user_path	GET	/superadmin/users/:id(.:format)	superadmin/users#show
+PATCH	/superadmin/users/:id(.:format)	superadmin/users#update
+PUT	/superadmin/users/:id(.:format)	superadmin/users#update
+DELETE	/superadmin/users/:id(.:format)	superadmin/users#destroy
+superadmin_organizations_path	GET	/superadmin/organizations(.:format)	superadmin/organizations#index
+POST	/superadmin/organizations(.:format)	superadmin/organizations#create
+new_superadmin_organization_path	GET	/superadmin/organizations/new(.:format)	superadmin/organizations#new
+edit_superadmin_organization_path	GET	/superadmin/organizations/:id/edit(.:format)	superadmin/organizations#edit
+superadmin_organization_path	GET	/superadmin/organizations/:id(.:format)	superadmin/organizations#show
+PATCH	/superadmin/organizations/:id(.:format)	superadmin/organizations#update
+PUT	/superadmin/organizations/:id(.:format)	superadmin/organizations#update
+DELETE	/superadmin/organizations/:id(.:format)	superadmin/organizations#destroy
+superadmin_synchronizations_path	GET	/superadmin/synchronizations(.:format)	superadmin/synchronizations#index
+POST	/superadmin/synchronizations(.:format)	superadmin/synchronizations#create
+new_superadmin_synchronization_path	GET	/superadmin/synchronizations/new(.:format)	superadmin/synchronizations#new
+edit_superadmin_synchronization_path	GET	/superadmin/synchronizations/:id/edit(.:format)	superadmin/synchronizations#edit
+superadmin_synchronization_path	GET	/superadmin/synchronizations/:id(.:format)	superadmin/synchronizations#show
+PATCH	/superadmin/synchronizations/:id(.:format)	superadmin/synchronizations#update
+PUT	/superadmin/synchronizations/:id(.:format)	superadmin/synchronizations#update
+DELETE	/superadmin/synchronizations/:id(.:format)	superadmin/synchronizations#destroy
+superadmin_feature_flags_path	GET	/superadmin/feature_flags(.:format)	superadmin/feature_flags#index
+POST	/superadmin/feature_flags(.:format)	superadmin/feature_flags#create
+new_superadmin_feature_flag_path	GET	/superadmin/feature_flags/new(.:format)	superadmin/feature_flags#new
+edit_superadmin_feature_flag_path	GET	/superadmin/feature_flags/:id/edit(.:format)	superadmin/feature_flags#edit
+superadmin_feature_flag_path	GET	/superadmin/feature_flags/:id(.:format)	superadmin/feature_flags#show
+PATCH	/superadmin/feature_flags/:id(.:format)	superadmin/feature_flags#update
+PUT	/superadmin/feature_flags/:id(.:format)	superadmin/feature_flags#update
+DELETE	/superadmin/feature_flags/:id(.:format)	superadmin/feature_flags#destroy
+superadmin_account_types_path	POST	/superadmin/account_types(.:format)	superadmin/account_types#create
+superadmin_account_type_path	PATCH	/superadmin/account_types/:id(.:format)	superadmin/account_types#update
+PUT	/superadmin/account_types/:id(.:format)	superadmin/account_types#update
+DELETE	/superadmin/account_types/:id(.:format)	superadmin/account_types#destroy
+superadmin_user_migration_exports_path	POST	/superadmin/user_migration_exports(.:format)	carto/superadmin/user_migration_exports#create
+superadmin_user_migration_export_path	GET	/superadmin/user_migration_exports/:id(.:format)	carto/superadmin/user_migration_exports#show
+superadmin_user_migration_imports_path	POST	/superadmin/user_migration_imports(.:format)	carto/superadmin/user_migration_imports#create
+superadmin_user_migration_import_path	GET	/superadmin/user_migration_imports/:id(.:format)	carto/superadmin/user_migration_imports#show
+usage_superadmin_user_path	GET	/superadmin/users/:id/usage(.:format)	carto/superadmin/users#usage
+usage_superadmin_organization_path	GET	/superadmin/organizations/:id/usage(.:format)	carto/superadmin/organizations#usage
+superadmin_get_databases_info_path	GET	/superadmin/get_databases_info(.:format)	superadmin/platform#databases_info {:format=>:json}
+superadmin_database_validation_path	GET	/superadmin/database_validation(.:format)	superadmin/platform#database_validation {:format=>:json}
+superadmin_stats_total_users_path	GET	/superadmin/stats/total_users(.:format)	superadmin/platform#total_users {:format=>:json}
+superadmin_stats_total_pay_users_path	GET	/superadmin/stats/total_pay_users(.:format)	superadmin/platform#total_pay_users {:format=>:json}
+superadmin_stats_total_datasets_path	GET	/superadmin/stats/total_datasets(.:format)	superadmin/platform#total_datasets {:format=>:json}
+superadmin_stats_total_seats_among_orgs_path	GET	/superadmin/stats/total_seats_among_orgs(.:format)	superadmin/platform#total_seats_among_orgs {:format=>:json}
+superadmin_stats_total_shared_objects_among_orgs_path	GET	/superadmin/stats/total_shared_objects_among_orgs(.:format)	superadmin/platform#total_shared_objects_among_orgs {:format=>:json}
+superadmin_stats_total_visualizations_path	GET	/superadmin/stats/total_visualizations(.:format)	superadmin/platform#total_visualizations {:format=>:json}
+superadmin_stats_total_maps_path	GET	/superadmin/stats/total_maps(.:format)	superadmin/platform#total_maps {:format=>:json}
+superadmin_stats_total_active_users_path	GET	/superadmin/stats/total_active_users(.:format)	superadmin/platform#total_active_users {:format=>:json}
+superadmin_stats_total_likes_path	GET	/superadmin/stats/total_likes(.:format)	superadmin/platform#total_likes {:format=>:json}
+api_v3_users_me_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/me(.:format)	carto/api/users#me {:format=>:json}
+api_v3_users_update_me_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/me(.:format)	carto/api/users#update_me {:format=>:json}
+api_v3_users_delete_me_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/me(.:format)	carto/api/users#delete_me {:format=>:json}
+api_v3_maps_layers_update_many_widgets_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/widgets(.:format)	carto/api/widgets#update_many {:format=>:json}
+widgets_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/layers/:map_layer_id/widgets(.:format)	carto/api/widgets#create {:format=>:json, :map_id=>/[^\/]+/, :map_layer_id=>/[^\/]+/}
+widget_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/layers/:map_layer_id/widgets/:id(.:format)	carto/api/widgets#show {:format=>:json, :map_id=>/[^\/]+/, :map_layer_id=>/[^\/]+/, :id=>/[^\/]+/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/layers/:map_layer_id/widgets/:id(.:format)	carto/api/widgets#update {:format=>:json, :map_id=>/[^\/]+/, :map_layer_id=>/[^\/]+/, :id=>/[^\/]+/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/layers/:map_layer_id/widgets/:id(.:format)	carto/api/widgets#update {:format=>:json, :map_id=>/[^\/]+/, :map_layer_id=>/[^\/]+/, :id=>/[^\/]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/maps/:map_id/layers/:map_layer_id/widgets/:id(.:format)	carto/api/widgets#destroy {:format=>:json, :map_id=>/[^\/]+/, :map_layer_id=>/[^\/]+/, :id=>/[^\/]+/}
+api_v3_visualizations_vizjson_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:id/viz(.:format)	carto/api/visualizations#vizjson3 {:format=>:json, :id=>/[^\/]+/}
+metrics_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/metrics(.:format)	carto/api/metrics#create {:format=>:json}
+api_keys_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/api_keys(.:format)	carto/api/api_keys#index {:format=>:json}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v3/api_keys(.:format)	carto/api/api_keys#create {:format=>:json}
+api_key_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/api_keys/:id(.:format)	carto/api/api_keys#show {:format=>:json, :id=>/[^\/]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/api_keys/:id(.:format)	carto/api/api_keys#destroy {:format=>:json, :id=>/[^\/]+/}
+regenerate_api_key_token_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/api_keys/:id/token/regenerate(.:format)	carto/api/api_keys#regenerate_token {:format=>:json}
+analyses_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/analyses(.:format)	carto/api/analyses#create {:format=>:json}
+analysis_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/analyses/:id(.:format)	carto/api/analyses#show {:format=>:json, :id=>/[^\/]+/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/analyses/:id(.:format)	carto/api/analyses#update {:format=>:json, :id=>/[^\/]+/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/analyses/:id(.:format)	carto/api/analyses#update {:format=>:json, :id=>/[^\/]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/analyses/:id(.:format)	carto/api/analyses#destroy {:format=>:json, :id=>/[^\/]+/}
+mapcaps_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/mapcaps(.:format)	carto/api/mapcaps#index {:format=>:json}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/mapcaps(.:format)	carto/api/mapcaps#create {:format=>:json}
+mapcap_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/mapcaps/:id(.:format)	carto/api/mapcaps#show {:format=>:json, :id=>/[^\/]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/mapcaps/:id(.:format)	carto/api/mapcaps#destroy {:format=>:json, :id=>/[^\/]+/}
+state_path	PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/state(.:format)	carto/api/states#update {:format=>:json}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/state(.:format)	carto/api/states#update {:format=>:json}
+snapshots_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots(.:format)	carto/api/snapshots#index {:format=>:json}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots(.:format)	carto/api/snapshots#create {:format=>:json}
+snapshot_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots/:id(.:format)	carto/api/snapshots#show {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots/:id(.:format)	carto/api/snapshots#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots/:id(.:format)	carto/api/snapshots#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/snapshots/:id(.:format)	carto/api/snapshots#destroy {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+legends_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends(.:format)	carto/api/legends#index {:format=>:json, :layer_id=>/[^\/]+/}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends(.:format)	carto/api/legends#create {:format=>:json, :layer_id=>/[^\/]+/}
+legend_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends/:id(.:format)	carto/api/legends#show {:format=>:json, :id=>/[^\/]+/, :layer_id=>/[^\/]+/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends/:id(.:format)	carto/api/legends#update {:format=>:json, :id=>/[^\/]+/, :layer_id=>/[^\/]+/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends/:id(.:format)	carto/api/legends#update {:format=>:json, :id=>/[^\/]+/, :layer_id=>/[^\/]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/viz/:visualization_id/layer/:layer_id/legends/:id(.:format)	carto/api/legends#destroy {:format=>:json, :id=>/[^\/]+/, :layer_id=>/[^\/]+/}
+visualization_export_download_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/visualization_exports/:visualization_export_id/download(.:format)	carto/api/visualization_exports#download {:format=>:json, :visualization_export_id=>/[^\/]+/}
+visualization_exports_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/visualization_exports(.:format)	carto/api/visualization_exports#create {:format=>:json}
+visualization_export_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v3/visualization_exports/:id(.:format)	carto/api/visualization_exports#show {:format=>:json, :id=>/[^\/]+/}
+api_v3_static_notifications_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/notifications/:category(.:format)	carto/api/static_notifications#update {:format=>:json}
+organization_notifications_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v3/organizations/:organization_id/notifications(.:format)	carto/api/organization_notifications#create {:format=>:json}
+organization_notification_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v3/organizations/:organization_id/notifications/:id(.:format)	carto/api/organization_notifications#destroy {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+user_notification_path	PATCH	(/user/:user_domain)(/u/:user_domain)/api/v3/users/:user_id/notifications/:id(.:format)	carto/api/received_notifications#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/, :user_id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v3/users/:user_id/notifications/:id(.:format)	carto/api/received_notifications#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/, :user_id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+map_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/maps/:id(.:format)	carto/api/maps#show {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v2/maps/:id(.:format)	carto/api/maps#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v2/maps/:id(.:format)	carto/api/maps#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+api_v2_organization_users_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/organization/:id_or_name/users(.:format)	carto/api/organization_users#index {:format=>:json}
+api_v2_organization_users_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v2/organization/:id_or_name/users(.:format)	carto/api/organization_users#create {:format=>:json}
+api_v2_organization_users_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v2/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#show {:format=>:json}
+api_v2_organization_users_delete_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v2/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#destroy {:format=>:json}
+api_v2_organization_users_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v2/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#update {:format=>:json}
+GET	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:id(.:format)	carto/api/maps#show {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:id(.:format)	carto/api/maps#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/maps/:id(.:format)	carto/api/maps#update {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+assets_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/assets(.:format)	carto/api/organization_assets#index {:format=>:json}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/assets(.:format)	carto/api/organization_assets#create {:format=>:json}
+asset_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/assets/:id(.:format)	carto/api/organization_assets#show {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:organization_id/assets/:id(.:format)	carto/api/organization_assets#destroy {:format=>:json, :id=>/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})/}
+api_v1_organization_users_create_path	POST	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id_or_name/users(.:format)	carto/api/organization_users#create {:format=>:json}
+api_v1_organization_users_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#show {:format=>:json}
+api_v1_organization_users_delete_path	DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#destroy {:format=>:json}
+api_v1_organization_users_update_path	PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/organization/:id_or_name/users/:u_username(.:format)	carto/api/organization_users#update {:format=>:json}
+overlays_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays(.:format)	carto/api/overlays#index {:format=>:json, :visualization_id=>/[0-z\-]+/}
+POST	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays(.:format)	carto/api/overlays#create {:format=>:json, :visualization_id=>/[0-z\-]+/}
+overlay_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays/:id(.:format)	carto/api/overlays#show {:format=>:json, :visualization_id=>/[0-z\-]+/, :id=>/[0-z\-]+/}
+PATCH	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays/:id(.:format)	carto/api/overlays#update {:format=>:json, :visualization_id=>/[0-z\-]+/, :id=>/[0-z\-]+/}
+PUT	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays/:id(.:format)	carto/api/overlays#update {:format=>:json, :visualization_id=>/[0-z\-]+/, :id=>/[0-z\-]+/}
+DELETE	(/user/:user_domain)(/u/:user_domain)/api/v1/viz/:visualization_id/overlays/:id(.:format)	carto/api/overlays#destroy {:format=>:json, :visualization_id=>/[0-z\-]+/, :id=>/[0-z\-]+/}
+api_v1_connectors_index_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/connectors(.:format)	carto/api/connectors#index {:format=>:json}
+api_v1_connectors_show_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/connectors/:provider_id(.:format)	carto/api/connectors#show {:format=>:json}
+api_v1_connectors_tables_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/connectors/:provider_id/tables(.:format)	carto/api/connectors#tables {:format=>:json}
+api_v1_connectors_connect_path	GET	(/user/:user_domain)(/u/:user_domain)/api/v1/connectors/:provider_id/connect(.:format)	carto/api/connectors#connect {:format=>:json}
+carto_gears_api_path		/	CartoGearsApi::Engine

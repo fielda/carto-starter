@@ -1,0 +1,15 @@
+# If Git decides that the content is text, the line endings will be
+# normalized to LF on checkin. This keeps line endings consistent
+# in the repo no matter what happens in the working directory.
+* text=auto
+# Make the working directory consistent with the repo; use LF for both.
+* eol=lf
+
+# Tell Git that these files are binary, or not.
+# Binary files should not be normalized.
+*.png -text
+*.gif -text
+*.jpg -text
+*.jpeg -text
+*.ico -text
+*.gz -text

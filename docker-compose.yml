@@ -1,0 +1,160 @@
+version: '3'
+networks:
+  default:
+services:
+  # At this moment CartoDB requires Redis 4+
+  # http://cartodb.readthedocs.io/en/latest/components/redis.html
+  redis:
+    # 1. We use the image based on Alpine Linux because it is small.
+    # 2. CartoDB requires Redis 4+
+    #    https://github.com/CartoDB/cartodb/commit/c19e354
+    # 3. By default Redis is configured to only have periodic snapshotting
+    #    to disk. If stopped or restarted some data stored in Redis since the
+    #    last snapshot can be lost. In CARTO, Redis is not just a simple cache
+    #    storage. It stores information that need to be persisted.
+    #    TODO: For data safety, make sure to have proper values of save,
+    #    appendonly and appendfsync config attributes.
+    #    For more info check http://redis.io/topics/persistence
+    image: redis:4.0-alpine
+    ports:
+    - "6379:6379"
+
+  # For local dev work, we use Nginx as a reverse proxy to handle SSL.
+  nginx:
+    image: nginx:1.17-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      # The Nginx status page is at http://localhost:8080/status
+      - "8080:8080"
+    networks:
+      default:
+        aliases:
+          # Allow other containers like to reach Nginx with hosts like
+          # bolt.mapsapi.lan.
+          # Add known users as subdomains
+          - geocoder.mapsapi.lan
+          - dev.mapsapi.lan
+          - bolt.mapsapi.lan
+          # SQL API...
+          # Add known users as subdomains
+          - geocoder.sqlapi.lan
+          - dev.sqlapi.lan
+          - bolt.sqlapi.lan
+          # Carto Builder...
+          - carto.lan
+    volumes:
+      - ./nginx.server.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.server.status.conf:/etc/nginx/conf.d/status.conf
+      - ./nginx.http.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl
+    depends_on:
+      - carto_builder
+      # - tileserver
+  carto_postgres:
+    build:
+      context: .
+      dockerfile: DockerfileForCartoPostgres
+    networks:
+      default:
+  carto_sqlapi:
+    build:
+      context: .
+      dockerfile: DockerfileForCartoSQLAPI
+    networks:
+      default:
+    volumes:
+      - ./carto/config/carto-sql-api-dev.js:/CartoDB-SQL-API/config/environments/development.js
+    environment:
+      - HOSTING_ENVIRONMENT=DOCKER-COMPOSE
+      - NODE_ENV=development
+    depends_on:
+      - redis
+      - carto_postgres
+  carto_mapsapi:
+    build:
+      context: .
+      dockerfile: DockerfileForCartoMapsAPI
+    networks:
+      default:
+    volumes:
+      - ./carto/config/windshaft.js:/Windshaft-cartodb/config/environments/development.js
+    environment:
+      - HOSTING_ENVIRONMENT=DOCKER-COMPOSE
+      - NODE_ENV=development
+    depends_on:
+      - redis
+      - carto_postgres
+  carto_builder:
+    build:
+      context: .
+      dockerfile: DockerfileForCartoBuilder
+    networks:
+      default:
+    volumes:
+      - ./carto/config/app_config.yml:/cartodb/config/app_config.yml
+    environment:
+      - HOSTING_ENVIRONMENT=DOCKER-COMPOSE
+      - NODE_ENV=development
+      # Postgres User/PW/Host is needed for rake tasks called by
+      # scripts like create_dev_user and setup_organization.sh
+      # We override these values when hosting the containers on AWS
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=GoTornadoDino
+      - POSTGRES_HOST=carto_postgres
+    depends_on:
+      - redis
+      - carto_postgres
+      - carto_mapsapi
+      - carto_sqlapi
+    links:
+      # HACK: Allow Carto Builder to find the Maps and SQL machines
+      # by adding them to /etc/hosts for every user.
+      #
+      # This needs to be solved long-term by some kind of local DNS or
+      # service discovery (e.g. K8s) which can handle wildcard subdomains
+      # on carto_mapsapi and carto_sqlapi
+      #
+      # TODO: make Carto Builder talk to other services via Nginx.
+      #
+      # This is NOT solved by network > default > aliases on 'nginx' above
+      # because Carto Ruby app still calls Windshaft (and maybe the SQL API)
+      # with URLS like http://bolt.carto_mapsapi:8181/api/v1/...
+      #
+      - carto_mapsapi:dev.carto_mapsapi
+      - carto_mapsapi:bolt.carto_mapsapi
+      - carto_mapsapi:geocoder.carto_mapsapi
+      - carto_sqlapi:dev.carto_sqlapi
+      - carto_sqlapi:bolt.carto_sqlapi
+      - carto_sqlapi:geocoder.carto_sqlapi
+  mobile_tile_packager:
+    build:
+      context: .
+      dockerfile: DockerfileForMobileTilePackager
+    networks:
+      default:
+    environment:
+      - HOSTING_ENVIRONMENT=DOCKER-COMPOSE
+      - NODE_ENV=development
+    depends_on:
+      - carto_mapsapi
+    links:
+      # HACK: Allow mobile_tile_packager to find the Maps and SQL machines
+      # by adding them to /etc/hosts for every user.
+      #
+      # This needs to be solved long-term by some kind of local DNS or
+      # service discovery.
+      #
+      # TODO: make mobile_tile_packager talk to other services via Nginx.
+      #
+      - carto_mapsapi:dev.carto_mapsapi
+      - carto_mapsapi:bolt.carto_mapsapi
+      - carto_mapsapi:geocoder.carto_mapsapi
+  # tileserver:
+  #   container_name: tileserver
+  #   image: klokantech/tileserver-gl:latest
+  #   ports:
+  #       - "8888:80"
+  #   volumes:
+  #     # Copy your vector or raster based MBTiles into ./tileserver
+  #     - ./tileserver:/data:rw

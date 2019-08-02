@@ -1,0 +1,205 @@
+# vim:set filetype=dockerfile:
+
+# CARTO now requires PostgreSQL 10+
+FROM postgres:10.4
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# RUN add-apt-repository ppa:cartodb/postgresql-10 &&\
+#     add-apt-repository ppa:cartodb/gis &&\
+#     apt-get update
+
+# Run apt-get update to find software-properties-common.
+RUN apt-get update &&\
+    apt-get -y install \
+    # This is needed for add-apt-repository.
+    # See http://unix.stackexchange.com/a/45905/18918
+   software-properties-common
+
+RUN apt-get update &&\
+    apt-get -y install \
+    build-essential \
+    # Postgres client packages.
+    libpq5 \
+    libpq-dev \
+    # postgresql-client-10 \
+    # Postgres server packages
+    postgresql-10 \
+    postgresql-plpython-10 \
+    postgresql-server-dev-10 \
+    postgresql-contrib-10 \
+    postgresql-10-plproxy \
+    # Postgres Foreign Data Wrapper
+    # https://github.com/CartoDB/odbc_fdw
+    unixodbc-dev \
+    # psql can use use Vim for SQL editing
+    # http://www.craigkerstiens.com/2013/02/21/more-out-of-psql/
+    vim \
+    # Without Vim GUI Common, +clientserver is not available.
+    # We run Vim as a server so that it can be psql's editor.
+    vim-gui-common \
+    # Git is needed to grab sources.
+    git \
+    # wget is needed to install Python/Pip
+    wget
+    # TODO: Figure out how to install pgtune on Debian Jessie
+    # pgtune
+
+# Add GIS packages
+# The Carto PostGIS packages depend on some of these.
+RUN apt-get upgrade -y &&\
+    apt-get install -y \
+      libproj-dev \
+      proj-bin \
+      proj-data \
+      libgeos-c1v5 \
+      libgeos-dev \
+      gdal-bin \
+      libgdal-dev \
+      # Install this stuff for JSON/GeoJSON support.
+      libjson-c-dev \
+      python-simplejson
+
+# TODO: Is 1.10 okay or do we need version 2.1?
+ENV GDAL_DATA /usr/share/gdal/1.10
+
+# PostGIS packages
+RUN apt-get -y install \
+    # PostGIS "Lightweight Geometry" library
+    liblwgeom-2.4-0 \
+    libxml2-dev \
+    postgis \
+    postgresql-10-postgis-2.4 \
+    postgresql-10-postgis-scripts \
+    # Python headers needed for `pip install -r requirements.txt`
+    python-dev &&\
+    # Clear the cache.
+    rm -rf /var/lib/apt/lists/*
+
+# TODO: Move these into docker-compose.yml and a production key vault.
+ENV POSTGRES_USER="postgres" \
+    POSTGRES_PASSWORD="GoTornadoDino" \
+    POSTGRES_DB="postgres"
+
+# Python/Pip is needed to install Crankshaft.
+# If you move Crankshaft to another image, then remove Python/Pip as well.
+RUN wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py &&\
+    python /tmp/get-pip.py
+
+# Crankshaft: CARTO Spatial Analysis extension for PostgreSQL
+# Change the version message if you change the changeset ID!
+RUN cd / &&\
+    git clone https://github.com/CartoDB/crankshaft.git &&\
+    cd /crankshaft &&\
+    echo "Checking out Crankshaft 0.8.1+ (8c4057b)..." &&\
+    git checkout 8c4057bb7ae68154ceb701955f2b5ca0349419a4 &&\
+    make install &&\
+    # https://github.com/sverhoeven/docker-cartodb/commit/2f0be5a27f1ed
+    # Numpy gets upgraded after scikit-learn is installed
+    # make sure scikit-learn is compatible with currently installed numpy, by reinstalling
+    pip install --force-reinstall --no-cache-dir scikit-learn==0.14.1 &&\
+    cd ..
+
+# Observertory extension
+RUN cd / &&\
+    git clone --recursive https://github.com/CartoDB/observatory-extension.git &&\
+    cd /observatory-extension &&\
+    # Change the message if you change the changeset ID!
+    echo "Checking out 8acd5d3 (release 1.9.0+) ..." &&\
+    git checkout 8acd5d39b6bffc97949b2431957f6450c870a32e &&\
+    PGUSER=$POSTGRES_USER PGPASSWORD=$POSTGRES_PASSWORD make deploy
+
+# For now, CartoDB is resilient to the odbc_fdw not being available,
+# but we install it anyway.
+# https://github.com/CartoDB/cartodb/commit/8c3a6e41
+RUN git clone https://github.com/CartoDB/odbc_fdw.git
+
+RUN echo "----- Installing ODBC FDW for PostgreSQL 9.5, 9.6, and 10" &&\
+    cd /odbc_fdw &&\
+    # Change the message if you change the changeset ID!
+    echo "Checking out e911da7 (release 0.3.0) ..." &&\
+    git checkout e911da73a2f5ed71d6a59e6a7ded1e239e4492ed &&\
+    # We must run make install here (and not in an init script) because
+    # it needs root privileges. The base Postgres image steps-down from
+    # root with gosu, so now is our chance to do root level stuff.
+    make install
+
+# Note that schema_triggers are no longer needed
+# See https://github.com/CartoDB/cartodb-postgresql/pull/190
+
+# Build Carto's custom Postgres extension.
+RUN git clone https://github.com/CartoDB/cartodb-postgresql.git
+
+# Install it.
+RUN echo "----- Installing CartoDB Postgres extension" &&\
+    cd /cartodb-postgresql &&\
+    # Change the message if you change the changeset ID!
+    echo "Checking out 51a669f (release 0.23.2, 2018-07-19) ..." &&\
+    git checkout 51a669f93c5fd6cd0dea7131e41887be13d00daf &&\
+    make all install &&\
+    # Add this directory to LD_LIBRARY_PATH
+    ldconfig
+
+# Install pip
+RUN wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py &&\
+    python /tmp/get-pip.py
+
+# Geocoder dataserices
+RUN git clone https://github.com/CartoDB/data-services.git &&\
+    cd /data-services &&\
+    # Change the message if you change the changeset ID!
+    echo "Checking out CartoDB/data-services 6dca916 (2018-05-16) ..." &&\
+    git checkout 6dca916ad5c426dc3dedeee5260c18bc4d63276a &&\
+    cd /data-services/geocoder/extension &&\
+    PGUSER=postgres make all install
+
+# Geocoder data services API
+RUN git clone https://github.com/CartoDB/dataservices-api.git &&\
+    cd /dataservices-api &&\
+    echo "Checking out CartoDB/dataservices-api 075f602 (2018-07-25) ..." &&\
+    git checkout 075f602a7f3ed5bd5fa76407c8d89afffca65a3a &&\
+    cd /dataservices-api/server/extension &&\
+    PGUSER=postgres make install
+RUN cd /dataservices-api/server/lib/python/cartodb_services &&\
+    pip install -r requirements.txt &&\
+    pip install . --upgrade &&\
+    cd ../../../../client &&\
+    PGUSER=postgres make install
+
+# CartoDB installations assume UTF-8.
+# https://github.com/docker-library/postgres/blob/master/9.5/Dockerfile#L31
+# shows that localedef is already run when using the official Postgres image,
+# but we must RUN IT AGAIN for some reason... initdb will otherwise fail.
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+# These configs improve bash, Vim and psql.
+COPY ["./dotfiles/*","/root/"]
+
+# Start Vim (in the background) in server mode to be ready as the psql EDITOR
+RUN vim --servername PSQL &
+ENV EDITOR="vim --servername PSQL --remote-tab-wait"
+
+# To do additional initialization in an image derived from 'postgres', add
+# one or more *.sql or *.sh scripts under /docker-entrypoint-initdb.d
+# After the entrypoint calls initdb to create the default postgres user
+# and database, it will run any *.sql files and source any *.sh scripts
+# found in that directory.
+RUN mkdir --parents /docker-entrypoint-initdb.d
+
+# These files will be EXECUTED IN SORTED NAME ORDER as defined by the
+# current locale, which defaults to en_US.utf8.
+# SQL files starting with an underscore are ignored.
+COPY carto/postgres/[^_]*.sql carto/postgres/[^_]*.sh /docker-entrypoint-initdb.d/
+
+# Copy in custom connection rules for Carto.
+# The file should be moved to /$PGDATA/ after our base Docker image
+# initializes Postgres.
+COPY ["./carto/postgres/pg_hba.conf","/tmp/pg_hba.conf"]
+
+# We load a copy of the default postgresql.conf in which `listen_addresses`
+# has been changed to allow connections from other containers like
+# carto_builder and carto_sqlapi.
+# This file should be moved to /$PGDATA/ after our base Docker image
+# initalizes Postgres. https://stackoverflow.com/a/30850095/23566
+COPY ["./carto/postgres/postgresql.conf","/tmp/postgresql.conf"]
