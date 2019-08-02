@@ -120,7 +120,9 @@ CartoDB tables have no pre-determined data model except for a
 The network setup for Builder, SQL API, Maps API, and the database is
 complicated. We use Nginx to proxy requests to the APIs and to Carto Builder.
 
-This setup should be improved, but for now, you'll need to add
+1. To create your self-signed certs, run `ssl/make-certs.sh`
+
+2. This setup should be improved, but for now, you'll need to add
 entries into your machine's `/etc/hosts` file:
 
 ```Shell
