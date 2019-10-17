@@ -1,18 +1,24 @@
 Table of Contents
 =================
 
-   * [Notice](#notice)
+   * [Advice](#advice)
    * [Getting Started](#getting-started)
    * [About the Containers](#about-the-containers)
    * [Your Hosts Config](#your-hosts-config)
    * [Notes on AWS ECS](#notes-on-aws-ecs)
 
-## Notice
+## Advice
 
-This repo is *BETA* software. It attempts to provide a solid starting point
-for running CartoDB in a multi-container environment, but CartoDB is
-complex and we do not pretend to have all the configurations and installation
-steps perfected.
+If you want to self-host CartoDB as a multi-container *production* environment, **don't**.
+
+This repo is at best *BETA* software. It attempts to provide a starting point
+for running CartoDB across multiple Docker containers, but CartoDB has a thousand
+half-documented configs, and worse, ten thousand dependencies which are hard to
+setup and maintain. After weeks of digging into the internals, we could see no light
+at the end of the tunnel.
+
+And finally, see [ruralinnovation/multi-svc-cartodb](https://github.com/ruralinnovation/multi-svc-cartodb)
+as another great attempt to containerize CartoDB. Good luck!
 
 ## Getting Started
 
